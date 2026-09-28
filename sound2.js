@@ -1,3 +1,4 @@
+// ★ あなたの12ファイル
 const audioFiles = [
     "audio/sougou_tsunami_high_1.wav",
     "audio/sougou_tsunami_high_1.5.wav",
@@ -13,6 +14,7 @@ const audioFiles = [
     "audio/sougou_tamagawa_low_1.5.wav"
 ];
 
+// ★ ランダム順で1回ずつ
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -28,43 +30,20 @@ let ratingDone = false;
 let soundResults = [];
 
 document.getElementById("playButton").onclick = () => {
-    const audio = new Audio(audioFiles[index]);
-    audio.play();
+    playSound();
 };
 
-function createChoiceButtons() {
-    const container = document.getElementById("choice-buttons");
-    container.innerHTML = "";
-
-    const choices = [
-        "津波が来ています。逃げてください。",
-        "Jアラートが発令されました。",
-        "多摩川が氾濫しました。"
-    ];
-
-    choices.forEach(choice => {
-        const btn = document.createElement("button");
-        btn.textContent = choice;
-
-        btn.onclick = () => {
-            checkAnswer(choice);
-        };
-
-        container.appendChild(btn);
-    });
+function playSound() {
+    const file = audioFiles[index];
+    const audio = new Audio(file);
+    audio.play();
 }
 
-createChoiceButtons();
-
-function checkAnswer(choice) {
+document.getElementById("checkButton").onclick = () => {
+    const userAnswer = document.getElementById("answerInput").value.trim();
     const file = audioFiles[index];
 
-    let correct = "";
-    if (file.includes("tsunami")) correct = "津波が来ています。逃げてください。";
-    else if (file.includes("jarert")) correct = "Jアラートが発令されました。";
-    else if (file.includes("tamagawa")) correct = "多摩川が氾濫しました。";
-
-    let score = (choice === correct) ? 1 : 0;
+    let score = (userAnswer !== "") ? 1 : 0;
 
     soundResults.push({
         file,
@@ -75,7 +54,7 @@ function checkAnswer(choice) {
 
     document.getElementById("ratingTitle").style.display = "block";
     createRatingButtons();
-}
+};
 
 function createRatingButtons() {
     const container = document.getElementById("rating-buttons");
@@ -135,7 +114,7 @@ function proceedNext() {
 
     answerDone = false;
     ratingDone = false;
-
+    document.getElementById("answerInput").value = "";
     document.getElementById("ratingTitle").style.display = "none";
     document.getElementById("evacTitle").style.display = "none";
     document.getElementById("rating-buttons").innerHTML = "";

@@ -73,19 +73,31 @@ function showNext() {
         bgColor: combo.color.bgColor,
         blink: combo.blink
     });
+
+    createChoiceButtons(warning);
 }
 
-document.getElementById("checkButton").onclick = () => {
-    const userAnswer = document.getElementById("answerInput").value.trim();
-    const last = colorResults[colorResults.length - 1];
+function createChoiceButtons(correctWarning) {
+    const container = document.getElementById("choice-buttons");
+    container.innerHTML = "";
 
-    last.score = (userAnswer === last.warning) ? 1 : 0;
+    warnings.forEach(w => {
+        const btn = document.createElement("button");
+        btn.textContent = w;
+        btn.onclick = () => checkAnswer(w, correctWarning);
+        container.appendChild(btn);
+    });
+}
+
+function checkAnswer(choice, correct) {
+    const last = colorResults[colorResults.length - 1];
+    last.score = (choice === correct) ? 1 : 0;
 
     answerDone = true;
 
     document.getElementById("ratingTitle").style.display = "block";
     createRatingButtons();
-};
+}
 
 function createRatingButtons() {
     const container = document.getElementById("rating-buttons");
@@ -146,7 +158,6 @@ function proceedNext() {
     answerDone = false;
     ratingDone = false;
 
-    document.getElementById("answerInput").value = "";
     document.getElementById("ratingTitle").style.display = "none";
     document.getElementById("evacTitle").style.display = "none";
     document.getElementById("rating-buttons").innerHTML = "";

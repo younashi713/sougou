@@ -45,15 +45,10 @@ function createChoiceButtons() {
     choices.forEach(choice => {
         const btn = document.createElement("button");
         btn.textContent = choice;
-
-        btn.onclick = () => {
-            checkAnswer(choice);
-        };
-
+        btn.onclick = () => checkAnswer(choice);
         container.appendChild(btn);
     });
 }
-
 createChoiceButtons();
 
 function checkAnswer(choice) {
@@ -64,13 +59,9 @@ function checkAnswer(choice) {
     else if (file.includes("jarert")) correct = "Jアラートが発令されました。";
     else if (file.includes("tamagawa")) correct = "多摩川が氾濫しました。";
 
-    let score = (choice === correct) ? 1 : 0;
+    const score = (choice === correct) ? 1 : 0;
 
-    soundResults.push({
-        file,
-        score
-    });
-
+    soundResults.push({ file, score });
     answerDone = true;
 
     document.getElementById("ratingTitle").style.display = "block";
@@ -84,14 +75,11 @@ function createRatingButtons() {
     for (let i = 1; i <= 10; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
-
         btn.onclick = () => {
             soundResults[soundResults.length - 1].visibilityScore = i;
-
             document.getElementById("evacTitle").style.display = "block";
             createEvacButtons();
         };
-
         container.appendChild(btn);
     }
 }
@@ -103,7 +91,6 @@ function createEvacButtons() {
     for (let i = 1; i <= 10; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
-
         btn.onclick = () => {
             soundResults[soundResults.length - 1].evacScore = i;
             ratingDone = true;
@@ -113,7 +100,6 @@ function createEvacButtons() {
 
             document.getElementById("nextButton").style.display = "inline-block";
         };
-
         container.appendChild(btn);
     }
 }
@@ -129,7 +115,6 @@ function proceedNext() {
 
     if (index >= audioFiles.length) {
         saveCSV();
-        alert("すべて終了しました。結果が送信されます。");
         return;
     }
 
@@ -144,10 +129,9 @@ function proceedNext() {
     document.getElementById("nextButton").style.display = "none";
 }
 
-document.addEventListener("keydown", (e) => {
+document.addEventListener("keydown", e => {
     if (e.key === "Enter") proceedNext();
 });
-
 document.getElementById("nextButton").onclick = () => proceedNext();
 
 function saveCSV() {
@@ -156,22 +140,18 @@ function saveCSV() {
     let csv = "type,warning,textColor,bgColor,blink,file,score,visibilityScore,evacScore\n";
 
     colorResults.forEach(r => {
-        csv += `color,${r.warning},${r.textColor},${r.bgColor},${r.blink},,${r.score},${r.visibilityScore},${r.evacScore}\n`;
+        const blinkMark = r.blink ? "〇" : "×";
+        csv += `color,${r.warning},${r.textColor},${r.bgColor},${blinkMark},,${r.score},${r.visibilityScore},${r.evacScore}\n`;
     });
 
     soundResults.forEach(r => {
         csv += `sound,,,,,${r.file},${r.score},${r.visibilityScore},${r.evacScore}\n`;
     });
 
-    // ★ GAS の URL をここに貼る
     fetch("https://script.google.com/macros/s/AKfycbyWLJb1ySW1n2Gv7ng0h6ENwAuhbEx20ESsQVD_hTs-mzRDWAETmohZOJ7Tyz2RuR_k/exec", {
         method: "POST",
         body: csv
     })
-    .then(() => {
-        alert("結果があなたのメールに送信されました！");
-    })
-    .catch(() => {
-        alert("送信に失敗しました。");
-    });
+    .then(() => alert("結果があなたのメールに送信されました！"))
+    .catch(() => alert("送信に失敗しました。"));
 }

@@ -15,6 +15,7 @@ let colors = [
 
 let blinkOptions = [true, false];
 
+// 色 × 点滅 の全組み合わせを作成
 let combinations = [];
 for (let color of colors) {
     for (let blink of blinkOptions) {
@@ -22,6 +23,7 @@ for (let color of colors) {
     }
 }
 
+// シャッフル
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -37,6 +39,7 @@ let blinkInterval = null;
 
 let colorResults = [];
 
+// 点滅開始
 function startBlink() {
     const box = document.getElementById("color-box");
     let visible = true;
@@ -49,11 +52,13 @@ function startBlink() {
     }, 300);
 }
 
+// 点滅停止
 function stopBlink() {
     if (blinkInterval) clearInterval(blinkInterval);
     document.getElementById("color-box").style.visibility = "visible";
 }
 
+// 次の警報を表示
 function showNext() {
     const box = document.getElementById("color-box");
     const combo = combinations[index];
@@ -77,6 +82,7 @@ function showNext() {
     createChoiceButtons(warning);
 }
 
+// 5択ボタン生成
 function createChoiceButtons(correctWarning) {
     const container = document.getElementById("choice-buttons");
     container.innerHTML = "";
@@ -89,6 +95,7 @@ function createChoiceButtons(correctWarning) {
     });
 }
 
+// 判定
 function checkAnswer(choice, correct) {
     const last = colorResults[colorResults.length - 1];
     last.score = (choice === correct) ? 1 : 0;
@@ -99,6 +106,7 @@ function checkAnswer(choice, correct) {
     createRatingButtons();
 }
 
+// 見やすさ評価ボタン生成
 function createRatingButtons() {
     const container = document.getElementById("rating-buttons");
     container.innerHTML = "";
@@ -118,6 +126,7 @@ function createRatingButtons() {
     }
 }
 
+// 避難評価ボタン生成
 function createEvacButtons() {
     const container = document.getElementById("evac-buttons");
     container.innerHTML = "";
@@ -140,6 +149,7 @@ function createEvacButtons() {
     }
 }
 
+// 次へ進む
 function proceedNext() {
     if (!answerDone || !ratingDone) {
         document.getElementById("message").textContent =
@@ -149,12 +159,14 @@ function proceedNext() {
 
     index++;
 
+    // 全組み合わせ終了 → sound2.html へ進む（最新版）
     if (index >= combinations.length) {
         localStorage.setItem("colorResults", JSON.stringify(colorResults));
-        window.location.href = "sound.html";
+        window.location.href = "sound2.html";   // ←ここが最重要修正点！
         return;
     }
 
+    // 次の問題へ
     answerDone = false;
     ratingDone = false;
 
@@ -168,10 +180,13 @@ function proceedNext() {
     showNext();
 }
 
+// Enterキーで次へ
 document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") proceedNext();
 });
 
+// 次へボタン
 document.getElementById("nextButton").onclick = () => proceedNext();
 
+// 初回表示
 showNext();

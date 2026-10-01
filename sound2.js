@@ -1,4 +1,3 @@
-// ★ あなたの12ファイル
 const audioFiles = [
     "audio/sougou_tsunami_high_1.wav",
     "audio/sougou_tsunami_high_1.5.wav",
@@ -14,7 +13,6 @@ const audioFiles = [
     "audio/sougou_tamagawa_low_1.5.wav"
 ];
 
-// ★ ランダム順で1回ずつ
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -30,20 +28,43 @@ let ratingDone = false;
 let soundResults = [];
 
 document.getElementById("playButton").onclick = () => {
-    playSound();
+    const audio = new Audio(audioFiles[index]);
+    audio.play();
 };
 
-function playSound() {
-    const file = audioFiles[index];
-    const audio = new Audio(file);
-    audio.play();
+function createChoiceButtons() {
+    const container = document.getElementById("choice-buttons");
+    container.innerHTML = "";
+
+    const choices = [
+        "津波が来ています。逃げてください。",
+        "Jアラートが発令されました。",
+        "多摩川が氾濫しました。"
+    ];
+
+    choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.textContent = choice;
+
+        btn.onclick = () => {
+            checkAnswer(choice);
+        };
+
+        container.appendChild(btn);
+    });
 }
 
-document.getElementById("checkButton").onclick = () => {
-    const userAnswer = document.getElementById("answerInput").value.trim();
+createChoiceButtons();
+
+function checkAnswer(choice) {
     const file = audioFiles[index];
 
-    let score = (userAnswer !== "") ? 1 : 0;
+    let correct = "";
+    if (file.includes("tsunami")) correct = "津波が来ています。逃げてください。";
+    else if (file.includes("jarert")) correct = "Jアラートが発令されました。";
+    else if (file.includes("tamagawa")) correct = "多摩川が氾濫しました。";
+
+    let score = (choice === correct) ? 1 : 0;
 
     soundResults.push({
         file,
@@ -54,7 +75,7 @@ document.getElementById("checkButton").onclick = () => {
 
     document.getElementById("ratingTitle").style.display = "block";
     createRatingButtons();
-};
+}
 
 function createRatingButtons() {
     const container = document.getElementById("rating-buttons");
@@ -108,13 +129,13 @@ function proceedNext() {
 
     if (index >= audioFiles.length) {
         saveCSV();
-        alert("すべて終了しました。CSVが保存されます。");
+        alert("すべて終了しました。結果が送信されます。");
         return;
     }
 
     answerDone = false;
     ratingDone = false;
-    document.getElementById("answerInput").value = "";
+
     document.getElementById("ratingTitle").style.display = "none";
     document.getElementById("evacTitle").style.display = "none";
     document.getElementById("rating-buttons").innerHTML = "";
@@ -142,11 +163,15 @@ function saveCSV() {
         csv += `sound,,,,,${r.file},${r.score},${r.visibilityScore},${r.evacScore}\n`;
     });
 
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "experiment_results.csv";
-    a.click();
+    // ★ GAS の URL をここに貼る
+    fetch("https://script.google.com/macros/s/AKfycbyWLJb1ySW1n2Gv7ng0h6ENwAuhbEx20ESsQVD_hTs-mzRDWAETmohZOJ7Tyz2RuR_k/exec", {
+        method: "POST",
+        body: csv
+    })
+    .then(() => {
+        alert("結果があなたのメールに送信されました！");
+    })
+    .catch(() => {
+        alert("送信に失敗しました。");
+    });
 }

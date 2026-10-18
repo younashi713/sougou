@@ -1,3 +1,4 @@
+alert("最新版");
 const audioFiles = [
     "audio/sougou_tsunami_high_1.wav",
     "audio/sougou_tsunami_high_1.5.wav",

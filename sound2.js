@@ -28,11 +28,29 @@ let ratingDone = false;
 let soundResults = [];
 
 document.getElementById("playButton").onclick = () => {
-    const audio = new Audio(audioFiles[index]);
-    audio.play();
+
+    const file = audioFiles[index];
+
+    console.log("再生ファイル:", file);
+
+    const audio = new Audio(file);
+
+    audio.play()
+        .then(() => {
+            console.log("再生成功:", file);
+        })
+        .catch(error => {
+            console.error(error);
+
+            alert(
+                "音声の再生に失敗しました。\n\n" +
+                file
+            );
+        });
 };
 
 function createChoiceButtons() {
+
     const container = document.getElementById("choice-buttons");
     container.innerHTML = "";
 
@@ -43,78 +61,121 @@ function createChoiceButtons() {
     ];
 
     choices.forEach(choice => {
+
         const btn = document.createElement("button");
+
         btn.textContent = choice;
+
         btn.onclick = () => checkAnswer(choice);
+
         container.appendChild(btn);
     });
 }
+
 createChoiceButtons();
 
 function checkAnswer(choice) {
+
+    if (answerDone) return;
+
     const file = audioFiles[index];
 
     let correct = "";
-    if (file.includes("tsunami")) correct = "津波が来ています。逃げてください。";
-    else if (file.includes("jarert")) correct = "Jアラートが発令されました。";
-    else if (file.includes("tamagawa")) correct = "多摩川が氾濫しました。";
 
-    const score = (choice === correct) ? 1 : 0;
+    if (file.includes("tsunami")) {
+        correct = "津波が来ています。逃げてください。";
+    }
+    else if (file.includes("jarert")) {
+        correct = "Jアラートが発令されました。";
+    }
+    else if (file.includes("tamagawa")) {
+        correct = "多摩川が氾濫しました。";
+    }
 
-    soundResults.push({ file, score });
+    const score = choice === correct ? 1 : 0;
+
+    soundResults.push({
+        file,
+        score
+    });
+
     answerDone = true;
 
     document.getElementById("ratingTitle").style.display = "block";
+
     createRatingButtons();
 }
 
 function createRatingButtons() {
+
     const container = document.getElementById("rating-buttons");
+
     container.innerHTML = "";
 
     for (let i = 1; i <= 10; i++) {
+
         const btn = document.createElement("button");
+
         btn.textContent = i;
+
         btn.onclick = () => {
+
             soundResults[soundResults.length - 1].visibilityScore = i;
+
             document.getElementById("evacTitle").style.display = "block";
+
             createEvacButtons();
         };
+
         container.appendChild(btn);
     }
 }
 
 function createEvacButtons() {
+
     const container = document.getElementById("evac-buttons");
+
     container.innerHTML = "";
 
     for (let i = 1; i <= 10; i++) {
+
         const btn = document.createElement("button");
+
         btn.textContent = i;
+
         btn.onclick = () => {
+
             soundResults[soundResults.length - 1].evacScore = i;
+
             ratingDone = true;
 
             document.getElementById("message").textContent =
-                "評価完了。Enterキーまたは「次へ」で進んでください。";
+                "評価完了。「次へ」を押してください。";
 
-            document.getElementById("nextButton").style.display = "inline-block";
+            document.getElementById("nextButton").style.display =
+                "inline-block";
         };
+
         container.appendChild(btn);
     }
 }
 
 function proceedNext() {
+
     if (!answerDone || !ratingDone) {
+
         document.getElementById("message").textContent =
             "判定と評価を両方終えてください。";
+
         return;
     }
 
     index++;
 
     if (index >= audioFiles.length) {
+
         saveCSV();
+
         return;
     }
 
@@ -122,36 +183,63 @@ function proceedNext() {
     ratingDone = false;
 
     document.getElementById("ratingTitle").style.display = "none";
+
     document.getElementById("evacTitle").style.display = "none";
+
     document.getElementById("rating-buttons").innerHTML = "";
+
     document.getElementById("evac-buttons").innerHTML = "";
+
     document.getElementById("message").textContent = "";
+
     document.getElementById("nextButton").style.display = "none";
 }
 
-document.addEventListener("keydown", e => {
-    if (e.key === "Enter") proceedNext();
-});
-document.getElementById("nextButton").onclick = () => proceedNext();
+document.getElementById("nextButton").onclick = () => {
+    proceedNext();
+};
 
 function saveCSV() {
-    const colorResults = JSON.parse(localStorage.getItem("colorResults"));
 
-    let csv = "type,warning,textColor,bgColor,blink,file,score,visibilityScore,evacScore\n";
+    const colorResults =
+        JSON.parse(localStorage.getItem("colorResults")) || [];
+
+    let csv =
+        "type,warning,textColor,bgColor,blink,file,score,visibilityScore,evacScore\n";
 
     colorResults.forEach(r => {
+
         const blinkMark = r.blink ? "〇" : "×";
-        csv += `color,${r.warning},${r.textColor},${r.bgColor},${blinkMark},,${r.score},${r.visibilityScore},${r.evacScore}\n`;
+
+        csv +=
+            `color,${r.warning},${r.textColor},${r.bgColor},${blinkMark},,${r.score},${r.visibilityScore},${r.evacScore}\n`;
     });
 
     soundResults.forEach(r => {
-        csv += `sound,,,,,${r.file},${r.score},${r.visibilityScore},${r.evacScore}\n`;
+
+        csv +=
+            `sound,,,,,${r.file},${r.score},${r.visibilityScore},${r.evacScore}\n`;
     });
 
-    fetch("https://script.google.com/macros/s/AKfycbyWLJb1ySW1n2Gv7ng0h6ENwAuhbEx20ESsQVD_hTs-mzRDWAETmohZOJ7Tyz2RuR_k/exec", {
-        method: "POST",
-        body: csv
-    })
-    .then(() => alert("結果があなたのメールに送信されました！"))
-    .catch(() => alert("送信に失敗しました。"));
+    fetch(
+        "https://script.google.com/macros/s/AKfycbyWLJb1ySW1n2Gv7ng0h6ENwAuhbEx20ESsQVD_hTs-mzRDWAETmohZOJ7Tyz2RuR_k/exec",
+        {
+            method: "POST",
+            body: csv
+        }
+    )
+        .then(() => {
+
+            alert(
+                "実験終了。\n結果を送信しました。"
+            );
+        })
+        .catch(err => {
+
+            console.error(err);
+
+            alert(
+                "送信に失敗しました。"
+            );
+        });
 }

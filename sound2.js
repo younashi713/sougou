@@ -15,8 +15,6 @@ const audioFiles = [
     "audio/sougou_tamagawa_low_1.5.wav"
 ];
 
-console.log(audioFiles);
-alert("sound2.js最新版");
 
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {

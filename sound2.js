@@ -1,19 +1,22 @@
-console.log(audioFiles);
-``
 const audioFiles = [
     "audio/sougou_tsunami_high_1.wav",
     "audio/sougou_tsunami_high_1.5.wav",
     "audio/sougou_tsunami_low_1.wav",
     "audio/sougou_tsunami_low_1.5.wav",
+
     "audio/sougou_jarert2_high_1.wav",
     "audio/sougou_jarert2_high_1.5.wav",
     "audio/sougou_jarert2_low_1.wav",
     "audio/sougou_jarert2_low_1.5.wav",
+
     "audio/sougou_tamagawa_high_1.wav",
     "audio/sougou_tamagawa_high_1.5.wav",
     "audio/sougou_tamagawa_low_1.wav",
     "audio/sougou_tamagawa_low_1.5.wav"
 ];
+
+console.log(audioFiles);
+alert("sound2.js最新版");
 
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {

@@ -29,6 +29,8 @@ let soundResults = [];
 
 document.getElementById("playButton").onclick = () => {
 
+    alert(audioFiles[index]);
+
     const file = audioFiles[index];
 
     console.log("再生ファイル:", file);
